@@ -28,19 +28,23 @@ export default function App() {
 
   function handleShowAddfriend() {
     setShowAddFriend((show) => !show);
-    // closes FormSplitBill component whenever trying to add a friend
+
+    // Closes FormSplitBill component whenever trying to add a friend.
     setSelectedFriend(null);
   }
 
   function handleAddFriend(friend) {
+    // In order to follow react principles of not mutating state, we copy the existing array of friends using the spread operator and append the new friend to the end of the array.
     setFriends((friends) => [...friends, friend]);
-    // makes FormAddFriend stop rendering after submitting the form to add the intended friend
+
+    // Makes FormAddFriend stop rendering after submitting the form to add the intended friend.
     setShowAddFriend(false);
   }
 
   function handleSelection(friend) {
     setSelectedFriend((cur) => (cur?.id === friend.id ? null : friend));
-    // closes FormAddFriend component after selecting a friend to split a bill with
+
+    // Closes FormAddFriend component after selecting a friend to split a bill with.
     setShowAddFriend(false);
   }
 
@@ -53,19 +57,25 @@ export default function App() {
           selectedFriend={selectedFriend}
         />
 
+        {/* Conditionally rendering the FormAddFriend by using the short circuiting method. */}
         {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
+
         <Button onClick={() => handleShowAddfriend()}>
           {showAddFriend === true ? "Close" : "Add Friend"}
         </Button>
       </div>
+
+      {/* Conditionally rendering the FormSplitBill by using the short circuiting method for whenever a friend is selected by clicking its corresponding button. */}
       {selectedFriend && <FormSplitBill selectedFriend={selectedFriend} />}
     </div>
   );
 }
 
+// onSelection and selectedFriend props were only passed to this component to be able to drill the components to the Friend component. (aka pass the props to its child component)
 function FriendsList({ friends, onSelection, selectedFriend }) {
   return (
     <ul>
+      {/* Rendering a list of friends dynamically by using the map method in order to scale the list */}
       {friends.map((friend) => (
         <Friend
           friendObj={friend}
@@ -79,11 +89,16 @@ function FriendsList({ friends, onSelection, selectedFriend }) {
 }
 
 function Friend({ friendObj, onSelection, selectedFriend }) {
+  // A boolean variable that is used to determine if a button should show "close" or "select" after comparing if they are the same friend.
   const isSelected = selectedFriend?.id === friendObj.id;
+
   return (
     <li className={isSelected ? "selected" : ""}>
       <img src={friendObj.image} alt={friendObj.name} />
       <h3>{`${friendObj.name}`}</h3>
+
+      {/* In order to keep my code easier to read (In my opinion), instead of using a nested ternary, I used 3 different conditional paragraphs. These paragraphs render what the financial standing was with a friend with a corresponding CSS class */}
+
       {friendObj.balance < 0 && (
         <p className="red">
           You owe {friendObj.name} ${Math.abs(friendObj.balance)}
@@ -114,11 +129,17 @@ function FormAddFriend({ onAddFriend }) {
   const [name, setName] = useState("");
   const [image, setImage] = useState("https://i.pravatar.cc/48");
 
+  // Adding a handleSubmit() function to the form that way the form can be submitted when the "Add" button is clicked or "enter" key is pressed instead of only adding "onClick" functionality to the button.
+
   function handleSubmit(e) {
     e.preventDefault();
 
+    // Guard to prevent the form being submitted without a name or image.
     if (!name || !image) return;
+
+    // In order to prevent duplicate ID's, I used crypto.randomUUID() instead of Math.random().
     const id = crypto.randomUUID();
+
     const newFriend = {
       id,
       name,
@@ -127,6 +148,7 @@ function FormAddFriend({ onAddFriend }) {
     };
     onAddFriend(newFriend);
 
+    //Resets form to default values after being submitted.
     setName("");
     setImage("https://i.pravatar.cc/48");
   }
@@ -152,6 +174,7 @@ function FormAddFriend({ onAddFriend }) {
   );
 }
 
+// Passing selectedFriend prop in order to be able to access the selectedFriends values into the form.
 function FormSplitBill({ selectedFriend }) {
   return (
     <form className="form-split-bill">
