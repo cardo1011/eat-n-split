@@ -28,15 +28,20 @@ export default function App() {
 
   function handleShowAddfriend() {
     setShowAddFriend((show) => !show);
+    // closes FormSplitBill component whenever trying to add a friend
+    setSelectedFriend(null);
   }
 
   function handleAddFriend(friend) {
     setFriends((friends) => [...friends, friend]);
+    // makes FormAddFriend stop rendering after submitting the form to add the intended friend
     setShowAddFriend(false);
   }
 
   function handleSelection(friend) {
     setSelectedFriend((cur) => (cur?.id === friend.id ? null : friend));
+    // closes FormAddFriend component after selecting a friend to split a bill with
+    setShowAddFriend(false);
   }
 
   return (
